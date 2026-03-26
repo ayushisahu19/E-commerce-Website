@@ -27,9 +27,9 @@ spec:
           RS_STATUS=$(mongo --quiet --host mongo-0.mongo --eval "rs.status().ok" || echo 0)
 
           if [ "$RS_STATUS" = "1" ]; then
-            echo "✅ Replica set already initialized, skipping rs.initiate()"
+            echo "Replica set already initialized, skipping rs.initiate()"
           else
-            echo "⚡ Initializing replica set..."
+            echo "Initializing replica set..."
             mongo --host mongo-0.mongo --eval "
               rs.initiate({
                 _id: 'rs0',
