@@ -87,7 +87,7 @@ function App() {
         <div className="header__inner">
           <div className="header__logo" onClick={() => setActiveTab('shop')}>
             <span className="logo-icon">◈</span>
-            <span className="logo-text">AYUSHI<span>STORE</span></span>
+            <span className="logo-text">ShopVerse<span>STORE</span></span>
           </div>
 
           <nav className="header__nav">
@@ -140,7 +140,7 @@ function App() {
                   Products
                 </h1>
                 <p className="hero__desc">
-                  Curated collection of high-quality items deployed on AWS EKS with real-time MongoDB sync.
+                  Curated collection of high-quality items deployed with real-time MongoDB sync.
                 </p>
                 <div className="hero__btns">
                   <button className="btn-primary" onClick={() => setActiveTab('catalogue')}>
@@ -342,7 +342,7 @@ function App() {
             </div>
             <div className="arch-grid">
               {[
-                { icon: '⚛️', tier: 'Tier 1', label: 'Frontend', desc: 'React 18 served via Nginx in a Docker container on AWS EKS', color: '#6366f1' },
+                { icon: '⚛️', tier: 'Tier 1', label: 'Frontend', desc: 'React 18 served via Nginx in a Docker container on Kubernetes', color: '#6366f1' },
                 { icon: '⚙️', tier: 'Tier 2', label: 'Backend', desc: 'Node.js + Express REST API with health checks and retry logic', color: '#f59e0b' },
                 { icon: '🗄️', tier: 'Tier 3', label: 'Database', desc: 'MongoDB replica set with 3-node HA and persistent volumes', color: '#10b981' },
               ].map(t => (
@@ -357,7 +357,7 @@ function App() {
             <div className="infra-banner">
               <div>
                 {/* <h3>Infrastructure</h3>
-                <p>Deployed on AWS EKS · Application Load Balancer ingress · GitOps workflow via GitHub</p> */}
+                <p>Deployed locally · Application Load Balancer ingress · GitOps workflow via GitHub</p> */}
               </div>
               <div className="infra-tags">
                 {['Docker', 'Kubernetes', 'AWS EKS', 'GitOps', 'MongoDB', 'Nginx'].map(t => (
@@ -373,12 +373,11 @@ function App() {
                   <div>
                     <strong>ETT Project</strong>
                     <p>by Aanya, Ayushi & Anubhuti</p>
-                    <a href="https://github.com/ayushisahu19" target="_blank" rel="noopener noreferrer">GitHub →</a>
+                    <a href="https://github.com/ayushisahu19/E-commerce-Website" target="_blank" rel="noopener noreferrer">GitHub →</a>
                   </div>
                 </div>
               </div>
               {/* <p className="reference-note">
-                Architecture inspired by <a href="https://github.com/harishnshetty/3-Tier-K8s-Project-GitOps" target="_blank" rel="noopener noreferrer">harishnshetty/3-Tier-K8s-Project-GitOps</a>
               </p> */}
             </div>
           </div>
