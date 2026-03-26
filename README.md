@@ -8,44 +8,35 @@ The objective of this project is to simulate a real-world DevOps workflow where 
 
 ---
 
-## Architecture
-
-The application follows a **three-tier architecture**:
-
-Client (Browser)
-        │
-        ▼
-Frontend (User Interface)
-        │
-        ▼
-Backend (Application / API Layer)
-        │
-        ▼
-Database (Persistent Storage)
-
-Each layer is deployed as a separate containerized service and managed using Kubernetes.
-
----
-
 ## Project Structure
-.
-├── app
-│ ├── frontend
-│ └── backend
+3-Tier-K8s-Project-GitOps/
 │
-├── docker
-│ ├── Dockerfile.frontend
-│ └── Dockerfile.backend
+├── frontend/ # React frontend (UI layer)
+│ ├── public/ # Static files
+│ ├── src/ # React components
+│ ├── Dockerfile # Multi-stage build (Node → Nginx)
+│ ├── nginx.conf # Nginx configuration
+│ └── package.json
 │
-├── k8s
-│ ├── deployment.yaml
-│ ├── service.yaml
-│ └── ingress.yaml
+├── backend/ # Node.js backend API
+│ ├── server.js
+│ ├── Dockerfile
+│ ├── package.json
+│ └── index.html
 │
-├── helm
+├── k8s/ # Kubernetes manifests
+│ ├── namespace.yml
+│ ├── secrets.yaml
+│ ├── mongo.yaml
+│ ├── mongo-init.yaml
+│ ├── backend.yaml
+│ └── frontend.yaml
 │
-├── docs
-│
+├── docker-compose.yml # Local multi-service setup
+├── docs/ # Documentation
+├── public/ # Environment/config files
+├── .env.example
+├── .gitignore
 └── README.md
 
 
@@ -55,7 +46,6 @@ Each layer is deployed as a separate containerized service and managed using Kub
 
 - Docker – Containerization of application services
 - Kubernetes – Container orchestration and deployment
-- Helm – Kubernetes package management
 - GitOps – Version-controlled infrastructure and deployment
 - GitHub – Source code management
 
@@ -66,7 +56,6 @@ Each layer is deployed as a separate containerized service and managed using Kub
 - Containerized frontend and backend services
 - Kubernetes-based application deployment
 - Infrastructure managed through version control
-- Scalable microservice-style architecture
 - GitOps-based workflow for automated deployments
 
 ---
