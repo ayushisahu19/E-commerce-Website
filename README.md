@@ -9,7 +9,7 @@ The objective of this project is to simulate a real-world DevOps workflow where 
 ---
 
 ## Project Structure
-3-Tier-K8s-Project-GitOps/
+<pre>3-Tier-K8s-Project-GitOps/
 │
 ├── frontend/ # React frontend (UI layer)
 │ ├── public/ # Static files
@@ -39,6 +39,7 @@ The objective of this project is to simulate a real-world DevOps workflow where 
 ├── .gitignore
 └── README.md
 
+</pre>
 
 ---
 
