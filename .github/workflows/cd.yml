@@ -1,0 +1,62 @@
+name: CD - Deploy to Kind Cluster
+
+on:
+  workflow_run:
+    workflows: ["CI - Build and Push Docker Images"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: self-hosted          # ← your local machine runs this
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ── Pull fresh images from Docker Hub into Kind ───────────
+      - name: Pull images from Docker Hub
+        run: |
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
+
+      - name: Load images into Kind cluster
+        run: |
+          kind load docker-image ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest --name three-tier
+          kind load docker-image ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest  --name three-tier
+
+      # ── Apply all k8s manifests ───────────────────────────────
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -f ./k8s-http/namespace.yml
+          kubectl apply -f ./k8s-http/mongo.yaml
+          kubectl apply -f ./k8s-http/mongo-init.yaml
+          kubectl apply -f ./k8s-http/backend.yaml
+          kubectl apply -f ./k8s-http/frontend.yaml
+
+      # ── Update deployment image to the new Docker Hub image ───
+      - name: Update frontend deployment image
+        run: |
+          kubectl set image deployment/frontend-deployment \
+            frontend=${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest \
+            -n 3-tier-ns
+
+      - name: Update backend deployment image
+        run: |
+          kubectl set image deployment/backend \
+            backend=${{ secrets.DOCKERHUB_USERNAME }}/backend:latest \
+            -n 3-tier-ns
+
+      # ── Wait for rollout ──────────────────────────────────────
+      - name: Wait for frontend rollout
+        run: kubectl rollout status deployment/frontend-deployment -n 3-tier-ns --timeout=120s
+
+      - name: Wait for backend rollout
+        run: kubectl rollout status deployment/backend -n 3-tier-ns --timeout=120s
+
+      - name: Deployment complete
+        run: |
+          echo "✅ Deployment complete!"
+          echo "Run this to access the app:"
+          echo "  kubectl port-forward -n 3-tier-ns svc/frontend-svc 8080:80"

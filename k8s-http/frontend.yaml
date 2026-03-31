@@ -17,8 +17,8 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: frontend   # ✅ FIXED (local image)
-        imagePullPolicy: Never
+        image: ayushisahu20/frontend:latest   # ← updated for CI/CD
+        imagePullPolicy: Always                           # ← changed from Never
         ports:
         - containerPort: 80
         resources:
@@ -41,5 +41,5 @@ spec:
   ports:
   - port: 80
     targetPort: 80
-    nodePort: 30007   
-  type: NodePort      
+    nodePort: 30007
+  type: NodePort
