@@ -47,14 +47,26 @@ const itemSchema = new mongoose.Schema({
 const Item = mongoose.model('Item', itemSchema);
 
 // Health check endpoint
+// app.get('/health', (req, res) => {
+//   const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+//   res.status(200).json({ 
+//     status: 'OK', 
+//     timestamp: new Date().toISOString(),
+//     database: dbStatus
+//   });
+// });
 app.get('/health', (req, res) => {
-  const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
-  res.status(200).json({ 
-    status: 'OK', 
+  const connected = mongoose.connection.readyState === 1;
+
+  res.status(connected ? 200 : 503).json({
+    status: connected ? 'OK' : 'NOT_READY',
     timestamp: new Date().toISOString(),
-    database: dbStatus
+    database: connected ? 'connected' : 'disconnected'
   });
 });
+
+
+
 
 // API Routes
 app.get('/api/items', async (req, res) => {

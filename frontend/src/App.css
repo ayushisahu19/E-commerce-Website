@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap');
 
 /* ── Variables ── */
@@ -284,6 +283,8 @@ body {
   gap: 10px;
   flex-wrap: wrap;
 }
+
+/* FIX 3: Replaced broken :first-child hack with explicit .active class */
 .category-pill {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -295,10 +296,16 @@ body {
   cursor: pointer;
   transition: all 0.2s;
 }
-.category-pill:hover, .category-pill:first-child {
-  background: rgba(167,139,250,0.1);
+.category-pill:hover {
+  background: rgba(167,139,250,0.08);
+  border-color: rgba(167,139,250,0.4);
+  color: var(--accent);
+}
+.category-pill.active {
+  background: rgba(167,139,250,0.15);
   border-color: var(--accent);
   color: var(--accent);
+  font-weight: 600;
 }
 
 /* ── Products Section ── */

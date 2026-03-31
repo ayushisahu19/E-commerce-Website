@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: frontend   
+        image: frontend   # ✅ FIXED (local image)
         imagePullPolicy: Never
         ports:
         - containerPort: 80
@@ -41,5 +41,5 @@ spec:
   ports:
   - port: 80
     targetPort: 80
-    nodePort: 30007  
+    nodePort: 30007   
   type: NodePort      

@@ -7,7 +7,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "0"
 spec:
   serviceName: "mongo"
-  replicas: 3
+  replicas: 1          # Single replica for local Docker Desktop
   selector:
     matchLabels:
       app: mongo
@@ -19,28 +19,27 @@ spec:
     spec:
       containers:
       - name: mongo
-        image: mongo:4.2
+        image: mongo:4.4   # 4.4 works better on modern kernels than 4.2
         command:
-        - "numactl"
-        - "--interleave=all"
         - "mongod"
-        - '--wiredTigerCacheSizeGB'
-        - "0.1"
-        - '--bind_ip'
-        - '0.0.0.0'
-        - '--replSet'
-        - rs0       
+        - "--wiredTigerCacheSizeGB"
+        - "0.25"
+        - "--bind_ip"
+        - "0.0.0.0"
+        - "--replSet"
+        - "rs0"
         ports:
         - containerPort: 27017
-        readinessProbe:  # Added readiness probe
+        readinessProbe:
           exec:
             command:
             - mongo
             - --eval
             - "db.adminCommand('ping')"
-          initialDelaySeconds: 10
-          periodSeconds: 5
-          timeoutSeconds: 2
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
         volumeMounts:
         - name: mg-pv-cont
           mountPath: /data/db
@@ -56,7 +55,6 @@ spec:
         name: mg-pv-cont
       spec:
         accessModes: ["ReadWriteOnce"]
-        storageClassName: standard
         resources:
           requests:
             storage: 1Gi
@@ -68,7 +66,6 @@ metadata:
   namespace: 3-tier-ns
   labels:
     app: mongo
-    replicaset: rs0.main
 spec:
   ports:
     - port: 27017
@@ -76,4 +73,3 @@ spec:
   clusterIP: None
   selector:
     app: mongo
-    replicaset: rs0.main

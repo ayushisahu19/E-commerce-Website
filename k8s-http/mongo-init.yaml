@@ -1,0 +1,84 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mongo-init
+  namespace: 3-tier-ns
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/hook: PostSync
+spec:
+  backoffLimit: 5
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: mongo-init
+        image: mongo:4.4
+        command:
+        - "bash"
+        - "-c"
+        - |
+          echo "Waiting for MongoDB to be ready..."
+          until mongo --host mongo-0.mongo --eval "db.adminCommand('ping')" >/dev/null 2>&1; do
+            echo "MongoDB not ready yet, waiting 5s..."
+            sleep 5
+          done
+
+          echo "Waiting a bit more for mongod to stabilize..."
+          sleep 10
+
+          echo "Checking replica set status..."
+          RS_STATUS=$(mongo --quiet --host mongo-0.mongo --eval "try { rs.status().ok } catch(e) { 0 }" 2>/dev/null || echo "0")
+
+          if [ "$RS_STATUS" = "1" ]; then
+            echo "Replica set already initialized"
+          else
+            echo "Initializing replica set..."
+            mongo --host mongo-0.mongo --eval "
+              rs.initiate({
+                _id: 'rs0',
+                members: [
+                  { _id: 0, host: 'mongo-0.mongo:27017' }
+                ]
+              })
+            "
+            echo "Waiting for primary election..."
+            sleep 15
+          fi
+
+          echo "Final replica set status:"
+          mongo --host mongo-0.mongo --eval "rs.status()"
+          echo "Done!"
+
+        # command:
+        # - "bash"
+        # - "-c"
+        # - |
+        #   echo "⏳ Waiting for MongoDB to be ready..."
+        #   until mongo --host mongo-0.mongo --eval "db.adminCommand('ping')" >/dev/null 2>&1; do
+        #     echo "MongoDB not ready yet, waiting 5s..."
+        #     sleep 5
+        #   done
+
+        #   echo "🔍 Checking if replica set is already initiated..."
+        #   RS_STATUS=$(mongo --quiet --host mongo-0.mongo --eval "try { rs.status().ok } catch(e) { 0 }" 2>/dev/null || echo "0")
+
+        #   if [ "$RS_STATUS" = "1" ]; then
+        #     echo "✅ Replica set already initialized, skipping rs.initiate()"
+        #   else
+        #     echo "⚡ Initializing replica set..."
+        #     mongo --host mongo-0.mongo --eval "
+        #       rs.initiate({
+        #         _id: 'rs0',
+        #         members: [
+        #           { _id: 0, host: 'mongo-0.mongo:27017' }
+        #         ]
+        #       })
+        #     "
+        #     echo "⏳ Waiting for primary election..."
+        #     sleep 10
+        #   fi
+
+        #   echo "🔍 Final replica set status:"
+        #   mongo --host mongo-0.mongo --eval "rs.status()"
+        #   echo "✅ Done!"

@@ -1,0 +1,146 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: backend
+#   namespace: 3-tier-ns
+#   labels:
+#     app: backend
+# spec:
+#   replicas: 2
+#   selector:
+#     matchLabels:
+#       app: backend
+#   template:
+#     metadata:
+#       labels:
+#         app: backend
+#     spec:
+#       containers:
+#       - name: backend
+#         image: backend
+#         imagePullPolicy: Never
+#         ports:
+#         - containerPort: 3000
+#         env:
+#         - name: MONGODB_URI
+#           # Single replica replica-set URI  (matches mongo.yaml replicas: 1)
+#           value: "mongodb://mongo-0.mongo:27017/app?replicaSet=rs0&directConnection=true"
+#         - name: PORT
+#           value: "3000"
+#         resources:
+#           requests:
+#             memory: "128Mi"
+#             cpu: "100m"
+#           limits:
+#             memory: "256Mi"
+#             cpu: "250m"
+#         # livenessProbe:
+#         #   httpGet:
+#         #     path: /health
+#         #     port: 3000
+#         #   initialDelaySeconds: 30
+#         #   periodSeconds: 10
+#         # readinessProbe:
+#         #   httpGet:
+#         #     path: /health
+#         #     port: 3000
+#         #   initialDelaySeconds: 10
+#         #   periodSeconds: 5
+#           livenessProbe:
+#             httpGet:
+#             path: /health
+#             port: 3000
+#           initialDelaySeconds: 40
+#           periodSeconds: 10
+#           failureThreshold: 3
+
+#         readinessProbe:
+#           httpGet:
+#             path: /health
+#             port: 3000
+#           initialDelaySeconds: 15
+#           periodSeconds: 5
+#           failureThreshold: 6
+
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: backend-svc
+#   namespace: 3-tier-ns
+# spec:
+#   selector:
+#     app: backend
+#   ports:
+#     - port: 3000
+#       targetPort: 3000
+#   type: ClusterIP
+
+#wrong indendation of above one 
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: 3-tier-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: backend
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3000
+
+        env:
+        - name: MONGODB_URI
+          value: "mongodb://mongo-0.mongo:27017/app?replicaSet=rs0&directConnection=true"
+        - name: PORT
+          value: "3000"
+
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 40
+          periodSeconds: 10
+          failureThreshold: 3
+
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          failureThreshold: 6
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-svc
+  namespace: 3-tier-ns
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: ClusterIP
